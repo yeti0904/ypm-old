@@ -1,0 +1,10 @@
+Yeti's Package Manager - YPM
+
+Setup
+=====
+`echo 'export PATH="${PATH}:/path/to/directory" >> ~/.bashrc'
+Thats all of setup, but please replace /path/to/directory with the directory that you put the ypm file in.
+
+Help
+====
+Just type `ypm` to get the help menu!

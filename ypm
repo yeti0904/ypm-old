@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+import colorama
+import sys
+import os
+import wget
+from colorama import init
+from colorama import Fore, Back, Style
+import random
+import getpass
+import requests
+init()
+
+
+def setup():
+	os.system("mkdir ~/.ypm")
+	print(Fore.GREEN +"[OK] " +Style.RESET_ALL +"YPM Has been created")
+
+# YPM help menu
+if len(sys.argv) == 1 or len(sys.argv) == 0:
+	print(Fore.GREEN +"YPM help menu:" +Style.RESET_ALL)
+	print("setup - set up Yeti Package Manager")
+	print("install - install a package")
+	print(Fore.YELLOW +"This package manager has " +Fore.GREEN +"Extreme Cow Powers")
+	exit()
+	
+# MOO
+moocolour = ["RED","BLUE","YELLOW","GREEN"]
+if sys.argv[1] == "moo":
+	for i in "aaa":
+		exec("print(Fore." +moocolour[random.randrange(0,3)] +")")
+		print("moo " * len("moo") +Style.RESET_ALL)
+	exit()
+
+# Setup 
+if sys.argv[1] == "setup":
+	print(Fore.GREEN +"[OK] " +Style.RESET_ALL +"Setting up YPM")
+	setup()
+	exit()
+	
+if os.path.exists("/home/" +str(getpass.getuser) +"/.ypm/"):
+	pass
+else:
+	print(Fore.RED +"[E] " +Style.RESET_ALL +"YPM has not been set up! Setting up now.")
+	setup()
+
+# Install
+if sys.argv[1] == "install":
+	if len(sys.argv) != 2:
+		toinstall = str(sys.argv[2])
+		print(Fore.GREEN +"[OK] " +Style.RESET_ALL +"Ready to download YPM installer.")
+		try:
+			installer = requests.get("https://mesyeti.uk/ypm/" +toinstall +".ypm")
+			print("\n")
+		except:
+			print(Fore.RED +"[E] " +Style.RESET_ALL +"Package not found!")
+			exit()
+		print("\n" +Fore.GREEN +"[OK] " +Style.RESET_ALL +"Downloaded YPM installer script.")
+		
+	else:
+		print(Fore.RED +"[E] " +"No package specified!")
+
+	# Interpret installer file
+	print(Fore.YELLOW +"[INFO] " +Style.RESET_ALL +"Running installer file")
+	'''
+	with open(toinstall +".ypm") as f:
+		installer = f.read().splitlines()
+	# Not needed: download replaced by curl.
+	'''
+	pathset = False
+	for line in installer:
+		if line[:5] == "path ":
+			path = line[5:]
+			pathset = True
+			print(Fore.YELLOW +"Set path to " +line[5:])
+			if path[-1] == "/":
+				path += "/"
+			os.system("mkdir " +path)
+		elif pathset == True:
+			if line[:5] == "step ":
+				print(Fore.YELLOW +"Setting up " +Style.RESET_ALL +str(line[5:]))
+			elif line[:9] == "download ":
+				print(Fore.YELLOW +"Downloading " +Style.RESET_ALL +str(line[9:]))
+				wget.download(line[9:])
+				print("\n")
+				print("mv " +line[int(line.rfind("/") + 1):] +" " +path)
+				os.system("mv " +line[int(line.rfind("/") + 1):] +" " +path)
+			elif line[:5] == "move ":
+				os.system("mv " +line[5:] +" > /dev/null 2>&1")
+				print(Fore.YELLOW +"Moved some files..")
+			elif line[:4] == "tar ":
+				os.system(line)
+			else:
+				print("Error at line " +str(installer.index(line)) +"!")
+				exit()
+		else:
+			print("Error at line " +str(installer.index(line)) +"!")
+			exit()
+		os.system("rm -f " +toinstall +".ypm")
+		print(Fore.GREEN +"[OK] " +Style.RESET_ALL +"Installation of " +str(toinstall) +" finished")
+		exit()
